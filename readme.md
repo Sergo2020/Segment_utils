@@ -8,11 +8,12 @@ Repository contains the following elements:
 
 <h3>Basic convolutional layers</h3>
 
-
-
+Description in progress....
 
 <h3>Modular U-Net</h3>
 
-
+Description in progress....
 
 <h3>Segmentation loss functions</h3>
+
+Description in progress....
