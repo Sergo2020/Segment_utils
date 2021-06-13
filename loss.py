@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 
 
-def Softmax(x):
+def softmax(x):
     return F.softmax(x)
 
 
@@ -13,11 +13,11 @@ def log_cosh_dc(pred, target, sigmoid):
     return torch.log((torch.exp(dc) + torch.exp(-dc)) / 2.0)
 
 
-def BCE(input, weights, target):
+def bce_loss(input, weights, target):
     return F.binary_cross_entropy(input, target, weight=weights, reduction="sum")
 
 
-def BCE_digits(input, weights, target):
+def bce_digits(input, weights, target):
     pw = 0.5 * torch.ones_like(input)
     return F.binary_cross_entropy_with_logits(input, target, weights, pos_weight=pw)
 
@@ -35,27 +35,27 @@ def dice_loss(pred, weights, target, epsilon=1e-7, sigmoid=False, w=None):
     return loss.mean()
 
 
-class Focal(nn.Module):
+class Focal_Loss(nn.Module):
     def __init__(self, gamma=2.0, loss_type='bce_digits', pw=0.5):
-        super(Focal, self).__init__()
+        super(Focal_Loss, self).__init__()
         self.gamma = nn.Parameter(data=torch.tensor(gamma), requires_grad=False)
         self.pw = nn.Parameter(data=torch.tensor(pw), requires_grad=False)
 
         if loss_type == 'bce':
-            self.loss = self.BCE
+            self.loss = self.calc_bce
         elif loss_type == 'bce_digits':
-            self.loss = self.BCE_digits
+            self.loss = self.calc_bce_digits
         elif loss_type == 'ce_digits':
-            self.loss = self.CE_digits
+            self.loss = self.calc_ce_digits
             self.pw = nn.Parameter(torch.tensor([1.0, pw, pw]), requires_grad=False)
 
-    def BCE(self, input, weights, target):
+    def calc_bce(self, input, weights, target):
         bce = F.binary_cross_entropy(input, target, reduction="none")
         pt = torch.exp(-bce)
         focal = weights * (1 - pt) ** self.gamma * bce
         return focal.sum()
 
-    def BCE_digits(self, input, weights, target):
+    def calc_bce_digits(self, input, weights, target):
         bce = F.binary_cross_entropy_with_logits(input, target, reduction="none")
         pt = torch.exp(-bce)
         pw = self.pw * torch.ones_like(input)
@@ -63,7 +63,7 @@ class Focal(nn.Module):
                                                                                         reduction="none", pos_weight=pw)
         return focal.sum() / len(input)
 
-    def CE_digits(self, input, weights, target, att):
+    def calc_ce_digits(self, input, weights, target, att):
         ce = F.cross_entropy(input, target.squeeze(1), reduction="none")
         pt = torch.exp(-ce)
         focal_loss = att * weights * ((1 - pt) ** self.gamma) * F.cross_entropy(input, target.squeeze(1),

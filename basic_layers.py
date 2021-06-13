@@ -5,7 +5,7 @@ import torch
 
 class Conv_Layer(nn.Module):
     """
-    Modified 2D convolutional layer torch.nn.Conv2d(). Includes: activations, pooling and normalization.
+    Modified 2D convolutional layer based on torch.nn.Conv2d(). Includes: activations, pooling and normalization.
 
 
     Attributes
@@ -85,7 +85,7 @@ class Conv_Layer(nn.Module):
 
 class DeConv_Layer(nn.Module):
     """
-    Modified 2D deconvolutional layer torch.nn.ConvTranspose2d(). Includes: activations, pooling and normalization.
+    Modified 2D deconvolutional layer based on torch.nn.ConvTranspose2d(). Includes: activations, pooling and normalization.
 
 
     Attributes
@@ -218,7 +218,7 @@ class Conv_Block(nn.Module):
             return torch.Tensor(0), x
 
 
-# -------- Functions ----------------------------------------------------------
+# -------- Methods ----------------------------------------------------------
 
 def concat_curr(prev : torch.Tensor, curr : torch.Tensor) -> torch.Tensor:
     """
