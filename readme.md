@@ -1,7 +1,7 @@
-<h2>Segmentation Utilities</h2>
+<h2>Semantic Segmentation Utilities</h2>
 
 Collection of useful classes and function for implementation of
-segmentation in PyTorch.
+semantic segmentation in PyTorch.
 
 Repository contains the following code files:
 - [basic_layer.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/basic_layers.py) - Basic convolutional layers, blocks and concatenation function.
@@ -23,7 +23,7 @@ only the number of layers, depth and skipp connection have to be specified. Addi
 class description.
 
 
-<h3>Segmentation loss functions</h3>
+<h3>Semantic Segmentation loss functions</h3>
 
 Description in progress....
 
