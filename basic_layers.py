@@ -222,7 +222,7 @@ class Conv_Block(nn.Module):
 
 def concat_curr(prev : torch.Tensor, curr : torch.Tensor) -> torch.Tensor:
     """
-    Matches 4D tensor by height and width and concatinates them by channels.
+    Matches 4D tensor [N, C, H, W] by height and width and concatenates them by channels (C).
 
 
     prev : torch.Tensor

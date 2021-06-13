@@ -3,7 +3,12 @@ from torch import nn
 from torch.nn import functional as F
 
 
-def softmax(x):
+def softmax(x : torch.Tensor) -> torch.Tensor:
+    """
+
+    :param x:
+    :return:
+    """
     return F.softmax(x)
 
 
