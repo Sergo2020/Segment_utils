@@ -6,7 +6,7 @@ semantic segmentation in PyTorch.
 Repository contains the following code files:
 - [basic_layer.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/basic_layers.py) - Basic convolutional layers, blocks and concatenation function.
 - [model_UNET.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/model_UNET.py) - Modular U-Net.
-- [loss.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/loss.py) - Segmentation loss and evaluation functions.
+- [loss.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/loss.py) - Segmentation loss and evaluation functions [2].
 
 
 <h3>Basic convolutional layers</h3>
@@ -31,4 +31,5 @@ Description in progress....
 
 <h2>References</h2>
 
-[[1]](https://arxiv.org/abs/1505.04597) Ronneberger, Olaf; Fischer, Philipp; Brox, Thomas (2015). "U-Net: Convolutional Networks for Biomedical Image Segmentation".
+[[1]](https://arxiv.org/abs/1505.04597) Ronneberger, Olaf, Fischer, Philipp; Brox, Thomas (2015). "U-Net: Convolutional Networks for Biomedical Image Segmentation".
+[[2]](https://arxiv.org/abs/2006.14822) Shruti Jadon (2020). "A survey of loss functions for semantic segmentation".
