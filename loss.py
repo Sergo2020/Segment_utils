@@ -3,35 +3,107 @@ from torch import nn
 from torch.nn import functional as F
 
 
-def softmax(x : torch.Tensor) -> torch.Tensor:
+def softmax(x: torch.Tensor) -> torch.Tensor:
     """
+    Default softmax function. Operates on channels in 4D tensors.
 
-    :param x:
-    :return:
+    x : torch.Tensor
+
+    return: torch.Tensor
     """
     return F.softmax(x)
 
 
-def log_cosh_dc(pred, target, sigmoid):
+def log_cosh_dc(pred: torch.Tensor, target: torch.Tensor, sigmoid: bool) -> torch.Tensor:
+    """
+    Log-Cosh Dice Loss.
+
+    prev : torch.Tensor
+        Predicted map. 4D tensor, may be not normalized by the sigmoid.
+
+    target : torch.Tensor
+        Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+    sigmoid : bool
+        Normalizes predicted mask with sigmoid function if True.
+
+    return: torch.Tensor
+        Loss value. Float tensor.
+    """
     dc = dice_loss(pred, target, sigmoid=sigmoid)
 
     return torch.log((torch.exp(dc) + torch.exp(-dc)) / 2.0)
 
 
-def bce_loss(input, weights, target):
-    return F.binary_cross_entropy(input, target, weight=weights, reduction="sum")
+def bce_loss(pred: torch.Tensor, weights: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """
+    Weighted binary cross entropy loss.
+
+    prev : torch.Tensor
+        Predicted map. 4D tensor, has to be normalized by the sigmoid.
+
+    weights : torch.Tensor
+        Pixel wise weights for predicted map. Normalized [0,1] 4D tensor.
+
+    target : torch.Tensor
+        Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+    return: torch.Tensor
+        Loss value. Float tensor.
+    """
+    return F.binary_cross_entropy(pred, target, weight=weights, reduction="mean")
 
 
-def bce_digits(input, weights, target):
-    pw = 0.5 * torch.ones_like(input)
-    return F.binary_cross_entropy_with_logits(input, target, weights, pos_weight=pw)
+def bce_digits(pred: torch.Tensor, weights: torch.Tensor, target: torch.Tensor,
+               pw: (None, float) = None) -> torch.Tensor:
+    """
+    Weighted binary cross entropy loss with logits and positive weights.
+
+    prev : torch.Tensor
+        Predicted map. 4D tensor, not normalized by the sigmoid.
+
+    weights : torch.Tensor
+        Pixel wise weights for predicted map. Normalized [0,1] 4D tensor.
+
+    target : torch.Tensor
+        Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+    pw : None or float
+        Weight of positive values. If None, pw = 1.
+
+    return: torch.Tensor
+        Loss value. Float tensor.
+    """
+    if not (pw is None):
+        pw = torch.ones_like(pred)
+    return F.binary_cross_entropy_with_logits(pred, target, weights, pos_weight=pw)
 
 
-def dice_loss(pred, weights, target, epsilon=1e-7, sigmoid=False, w=None):
+def dice_loss(pred: torch.Tensor, weights: torch.Tensor, target: torch.Tensor,
+              epsilon: float = 1e-7, sigmoid: bool = False) -> torch.Tensor:
+    """
+    Weighted dice loss.
+
+    prev : torch.Tensor
+        Predicted map. 4D tensor, may be not normalized by the sigmoid.
+
+    weights : torch.Tensor
+        Pixel wise weights for predicted map. Normalized [0,1] 4D tensor.
+
+    target : torch.Tensor
+        Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+    epsilon : float
+        Stability value. Default is 1e-7.
+
+    sigmoid : bool
+        Normalizes predicted mask with sigmoid function if True.
+
+    return: torch.Tensor
+        Loss value. Float tensor.
+    """
     if sigmoid:
         pred = torch.sigmoid(pred)
-    if not w is None:
-        pred = w * pred
     pred = pred.contiguous()
     target = target.contiguous()
     intersection = (weights * pred * target).sum(dim=2).sum(dim=2)
