@@ -25,9 +25,11 @@ class description.
 
 <h3>Semantic Segmentation loss functions</h3>
 
-Description in progress....
-
-
+Various semantic segmentation loss functions and metrics [2]:
+- Cross Entropy loss variants (binary, non binary, sample weighted and class weighted). 
+- Dice loss variants (binary, non binary, sample weighted). 
+- Focal loss.
+- Twersky loss, including implementation of Focal Twersky Loss. 
 
 <h2>References</h2>
 
