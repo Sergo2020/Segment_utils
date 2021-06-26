@@ -5,7 +5,7 @@ semantic segmentation in PyTorch.
 
 Repository contains the following code files:
 - [basic_layer.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/basic_layers.py) - Basic convolutional layers, blocks and concatenation function.
-- [model_UNET.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/model_UNET.py) - Modular U-Net.
+- [model_UNET.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/model_UNET.py) - Modular U-Net [1].
 - [loss.py](https://github.com/Sergo2020/Segment_utils_pytorch/blob/master/loss.py) - Segmentation loss and evaluation functions [2].
 
 
