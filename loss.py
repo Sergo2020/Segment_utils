@@ -118,10 +118,10 @@ def dice_loss(pred: torch.Tensor, weights: torch.Tensor, target: torch.Tensor,
 def dice_coeff(pred: torch.Tensor, target: torch.Tensor,
                eps: float = 1e-7, threshold: float = 0.5, soft_flag: bool = False):
     """
-    Dice coeficient for multiclass cases.
+    Dice coefficient for multiclass cases.
 
     pred : torch.Tensor
-        Predicted map. 4D tensor, not normilized by Softmax
+        Predicted map. 4D tensor, not normalized by Softmax
 
     target : torch.Tensor
         Target (ground truth) map. Normalized [0,1] 4D tensor.
@@ -168,6 +168,27 @@ def dice_coeff(pred: torch.Tensor, target: torch.Tensor,
 
 def dice_coeff_binary(pred: torch.Tensor, target: torch.Tensor, threshold=0.5, epsilon=1e-6,
                       sigmoid=False) -> torch.Tensor:
+    """
+        Dice coefficient for binary case.
+
+        pred : torch.Tensor
+            Predicted map. 4D tensor, not normalized by Softmax
+
+                target : torch.Tensor
+            Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+        sigmoid : bool
+            Normalizes predicted mask with sigmoid.
+
+        threshold : float
+            Decision threshold.
+
+        epsilon : float
+            Stability value. Default is 1e-7.
+
+        return: torch.Tensor
+            Coefficient value. Float tensor.
+        """
     if sigmoid:
         pred = torch.sigmoid(pred)
     pred = pred.contiguous()
@@ -179,7 +200,76 @@ def dice_coeff_binary(pred: torch.Tensor, target: torch.Tensor, threshold=0.5, e
     return dice.mean()
 
 
+def precision_binary(pred, target, sigmoid=False, threshold=0.5, epsilon=1e-6):
+    """
+        Precision for binary case.
+
+        pred : torch.Tensor
+            Predicted map. 4D tensor, not normalized by Softmax
+
+        target : torch.Tensor
+            Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+        sigmoid : bool
+            Normalizes predicted mask with sigmoid.
+
+        threshold : float
+            Decision threshold.
+
+        epsilon : float
+            Stability value. Default is 1e-7.
+
+        return: torch.Tensor
+            Coefficient value. Float tensor.
+    """
+    if sigmoid:
+        pred = torch.sigmoid(pred)
+
+    pred = pred.contiguous()
+    target = target.contiguous()
+
+    pred = (pred > threshold).float()
+    intersection = (pred * target).sum()
+    prec_val = intersection / (target.sum() + epsilon)
+    return prec_val.mean()
+
+
+def recall_binary(pred, target, sigmoid=False, threshold=0.5, epsilon=1e-6):
+    """
+        Recall for binary case.
+
+        pred : torch.Tensor
+            Predicted map. 4D tensor, not normalized by Softmax
+
+        target : torch.Tensor
+            Target (ground truth) map. Normalized [0,1] 4D tensor.
+
+        sigmoid : bool
+            Normalizes predicted mask with sigmoid.
+
+        threshold : float
+            Decision threshold.
+
+        epsilon : float
+            Stability value. Default is 1e-7.
+
+        return: torch.Tensor
+            Coefficient value. Float tensor.
+    """
+    if sigmoid:
+        pred = torch.sigmoid(pred)
+
+    pred = pred.contiguous()
+    target = target.contiguous()
+
+    pred = (pred > threshold).float()
+    intersection = (pred * target).sum()
+    rec_val = intersection / (pred.sum() + epsilon)
+    return rec_val.mean()
+
+
 class Focal_Loss(nn.Module):
+    # TODO: add description
     def __init__(self, gamma=2.0, loss_type='bce_digits', pw=0.5):
         super(Focal_Loss, self).__init__()
         self.gamma = nn.Parameter(data=torch.tensor(gamma), requires_grad=False)
@@ -219,6 +309,7 @@ class Focal_Loss(nn.Module):
 
 
 class Tversky(nn.Module):
+    # TODO: add description
     def __init__(self, alpha=0.5, gamma=1.0):
         super(Tversky, self).__init__()
         self.gamma = nn.Parameter(data=torch.tensor(gamma), requires_grad=False)
