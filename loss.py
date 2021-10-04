@@ -309,18 +309,56 @@ class Focal_Loss(nn.Module):
 
 
 class Tversky(nn.Module):
-    # TODO: add description
-    def __init__(self, alpha=0.5, gamma=1.0):
+        """
+    Focal Weighted Tversky loss.
+    
+    Attributes
+    ----------
+    alpha : float
+        False positive (FP) penalty value [0,1] (default is 0.5). True positive (TP) penalty will be calculated by 1 - alpha. 
+    inv_gamma : float
+        Inversed focusing parameter (default is 1.0, where focus has no effect, and expected is inv_gamma > 1.0). 
+    Methods
+    -------
+    tl(pred, weights, target):
+        Tversky loss calculation.
+            pred: torch.tensor
+                Predicted mask (model output) in shape of [N, C, H ,W].
+            weights: torch.tensor
+                Weights mask in shape of [N, C, H ,W].
+            target: torch.tensor
+                Target (ground truth) mask in shape of [N, C, H ,W] in range [0,1].
+            reuturn: torch.tensor
+                Loss value in shape of [1,].
+                
+     tlf(pred, weights, target):
+        Focal Tversky loss calculation, where result of tl method is multiplied by
+            pred: torch.tensor
+                Predicted mask (model output) in shape of [N, C, H ,W].
+            weights: torch.tensor
+                Weights mask in shape of [N, C, H ,W].
+            target: torch.tensor
+                Target (ground truth) mask in shape of [N, C, H ,W] in range [0,1].
+            reuturn: torch.tensor
+                Loss value in shape of [1,].
+            
+        
+    organize_arch()
+        Initializes network.
+    prep_params()
+        Registrates layer in model.
+    """
+    def __init__(self, alpha : float =0.5, inv_gamma: float=1.0)-> None:
         super(Tversky, self).__init__()
-        self.gamma = nn.Parameter(data=torch.tensor(gamma), requires_grad=False)
+        self.inv_gamma = nn.Parameter(data=torch.tensor(inv_gamma), requires_grad=False)
         self.alpha = nn.Parameter(data=torch.tensor(alpha), requires_grad=False)
 
         self.forward = self.tl
 
-        if gamma > 1.0:
+        if inv_gamma > 1.0:
             self.forward = self.tfl
 
-    def tl(self, pred, weights, target):
+    def tl(self, pred: torch.tensor, weights: torch.tensor, target: torch.tensor) -> torch.tensor:
         pred = weights * torch.sigmoid(pred)
 
         pred = pred.contiguous()
@@ -333,6 +371,6 @@ class Tversky(nn.Module):
             (1 + inter + a_inter + na_inter))))
         return loss.mean()
 
-    def tfl(self, pred, weights, target):
+    def tfl(self, pred: torch.tensor, weights: torch.tensor, target: torch.tensor) -> torch.tensor:
         loss = self.tl(pred, weights, target)
-        return torch.pow(loss, self.gamma)
+        return torch.pow(loss, self.inv_gamma)
